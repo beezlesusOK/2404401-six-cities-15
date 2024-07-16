@@ -1,17 +1,19 @@
 import React from 'react';
 import classNames from 'classnames';
-
+import {useAppDispatch, useAppSelector} from '../../store';
+import {changeCity} from '../../store/action';
+import {selectCity} from '../../store/selector';
 import {TCity} from '../../util/types';
 
-type TLocationItem = {
-  city: TCity;
-  active: boolean;
-  onCityItemClick: (city: TCity) => void;
-}
 
-export default function LocationItem({city, active, onCityItemClick}: TLocationItem): React.JSX.Element {
+export default function LocationItem({city}: {city: TCity}): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  const activeCity = useAppSelector(selectCity);
+  const isActive = activeCity === city;
   const handleClick = () => {
-    onCityItemClick(city);
+    if (!isActive) {
+      dispatch(changeCity(city));
+    }
   };
 
   return (
@@ -20,7 +22,7 @@ export default function LocationItem({city, active, onCityItemClick}: TLocationI
       onClick={handleClick}
     >
       <a
-        className={classNames('locations__item-link tabs__item', {'tabs__item--active': active})}
+        className={classNames('locations__item-link tabs__item', {'tabs__item--active': isActive})}
         href="#"
       >
         <span>{city.name}</span>

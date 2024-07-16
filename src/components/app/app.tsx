@@ -17,7 +17,7 @@ export default function App({offers}: {offers: TOffer[]}): JSX.Element {
       <BrowserRouter>
         <Routes>
           <Route path={AppRoute.Main} element={<Layout />}>
-            <Route index element={<WelcomeScreen offers={offers} />}/>
+            <Route index element={<WelcomeScreen />}/>
             <Route path={AppRoute.Login} element={<LoginScreen />}/>
             <Route
               path={AppRoute.Favorites}
