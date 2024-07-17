@@ -1,6 +1,7 @@
 import {State} from './state';
 
-const selectOffers = (state: State) => state.offers;
-const selectCity = (state: State) => state.city;
+export const selectOffers = (state: State) => state.offers;
+export const selectCity = (state: State) => state.city;
+export const selectSortItem = (state: State) => state.sort;
 
-export {selectCity, selectOffers};
+export default {selectCity, selectOffers, selectSortItem};

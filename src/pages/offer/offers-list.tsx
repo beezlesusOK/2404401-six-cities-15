@@ -5,15 +5,17 @@ import {AppRoute} from '../../util/const';
 import { TOffer} from '../../util/types';
 import OfferCard from './offer-card';
 import Map from '../../components/map/map';
-import OffersSorting from './offer-sorting';
 import {useAppSelector} from '../../store';
-import {selectCity, selectOffers} from '../../store/selector';
+import {selectCity, selectOffers, selectSortItem} from '../../store/selector';
+import OffersSorting from '../../components/sort/sorting';
+import {getSortedOffers} from '../../util/func';
 
 export default function OffersList({nameBlock}: {nameBlock: string}): React.JSX.Element {
   const offers = useAppSelector(selectOffers);
   const activeCity = useAppSelector(selectCity);
-
-  const offersFiltered = offers.filter((offer) => offer.city === activeCity);
+  const activeSortItem = useAppSelector(selectSortItem);
+  let offersFiltered = offers.filter((offer) => offer.city === activeCity);
+  offersFiltered = getSortedOffers(offersFiltered, activeSortItem);
 
 
   const [activeOffer, setActiveOffer] = useState<TOffer | null>(null);

@@ -1,4 +1,5 @@
 import leaflet from 'leaflet';
+import {TSortItem} from '../util/types';
 
 export const OFFER_INSIDE_ITEM = ['Wi-Fi', 'Washing machine', 'Towels', 'Heating', 'Coffee machine',
   'Baby seat', 'Kitchen', 'Dishwasher', 'Cabel TV', 'Fridge'];
@@ -35,3 +36,22 @@ export const currentCustomIcon = leaflet.icon({
   iconAnchor: [14, 39],
 });
 export const maxNearOffers = 3;
+
+export const sortOptions: TSortItem[] = [
+  {
+    code: 'popular',
+    name: 'Popular',
+  },
+  {
+    code: 'price_low_to_high',
+    name: 'Price: Low to High',
+  },
+  {
+    code: 'price_high_to_low',
+    name: 'Price: high to Low',
+  },
+  {
+    code: 'top_rated_first',
+    name: 'Top rated first',
+  }
+];
