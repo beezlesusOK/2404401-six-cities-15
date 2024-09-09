@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {TOffer} from '../../util/types';
-import {AppRoute} from '../../util/const';
+import {AppRoutess} from '../../util/const';
 
 function getRatingWidth(rating: number): string {
   return `${rating * (100 / 5)}%`;
@@ -13,12 +13,12 @@ type TOfferCardProps = {
 }
 
 export default function OfferCard({offer, handleHover}: TOfferCardProps): React.JSX.Element {
-  const {pathname} = useLocation() as {pathname: AppRoute};
+  const {pathname} = useLocation() as {pathname: AppRoutess};
   let classCard = 'cities';
 
-  if (pathname === AppRoute.OfferId) {
+  if (pathname === AppRoutess.OfferId) {
     classCard = 'near-places';
-  } else if (pathname === AppRoute.Favorites) {
+  } else if (pathname === AppRoutess.Favorites) {
     classCard = 'favorites';
   }
 
@@ -41,9 +41,9 @@ export default function OfferCard({offer, handleHover}: TOfferCardProps): React.
       onMouseLeave={handleMouseOff}
     >
       <div className={`${classCard}__image-wrapper place-card__image-wrapper`}>
-        <Link to={`${AppRoute.Offer}/${offer.id}`}>
+        <Link to={`${AppRoutess.Offer}/${offer.id}`}>
           <img className="place-card__image"
-            src={offer.images[0]}
+            src={offer.previewImage}
             width="260"
             height="200"
             style={{width: 260,height: 200}}
@@ -74,7 +74,7 @@ export default function OfferCard({offer, handleHover}: TOfferCardProps): React.
           </div>
         </div>
         <h2 className="place-card__name">
-          <Link to={`${AppRoute.Offer}/${offer.id}`}>{offer.title}</Link>
+          <Link to={`${AppRoutess.Offer}/${offer.id}`}>{offer.title}</Link>
         </h2>
         <p className="place-card__type">{offer.type}</p>
       </div>

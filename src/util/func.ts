@@ -1,5 +1,5 @@
 import { maxNearOffers } from './const';
-import {TOffer, TSortItem} from '../util/types';
+import {TOffer, TSortItem, TOffersByCity, TCity, TLocationCoordinates} from '../util/types';
 
 export function getNearOffers(offers: TOffer[], curOffer: TOffer): TOffer[] {
   const nearOffers = [];
@@ -17,6 +17,23 @@ export function getNearOffers(offers: TOffer[], curOffer: TOffer): TOffer[] {
   return nearOffers;
 }
 
+export function getOffersByCity(offers: TOffer[]): TOffersByCity[] {
+  if (!offers) {
+    return [];
+  }
+
+  const offersByCity: TOffersByCity[] = [];
+  offers.forEach((offer) => {
+    const cityIndex: number = offersByCity.findIndex((group) => group.city.name === offer.city.name);
+    if (cityIndex !== -1) {
+      offersByCity[cityIndex].offers.push(offer);
+    } else {
+      offersByCity.push({city: offer.city, offers: [offer]});
+    }
+  });
+  return offersByCity;
+}
+
 export function getSortedOffers(offers: TOffer[], sortItem: TSortItem) {
   switch (sortItem.code) {
     case 'popular':
@@ -31,3 +48,25 @@ export function getSortedOffers(offers: TOffer[], sortItem: TSortItem) {
       return offers;
   }
 }
+export function getRandomFloat(min: number, max: number): number {
+  return Math.random() * (max - min) + min;
+}
+export function getRandomLocationByCity({location}: TCity): TLocationCoordinates {
+  const minStepCoordinate: number = -0.02;
+  const maxStepCoordinate: number = 0.02;
+  const coordinates = location;
+  coordinates.latitude += getRandomFloat(minStepCoordinate, maxStepCoordinate);
+  coordinates.longitude += getRandomFloat(minStepCoordinate, maxStepCoordinate);
+  return coordinates;
+}
+
+export function getCitiesFromOffers(offers: TOffer[]): TCity[] {
+  const cities: TCity[] = [];
+  const offersByCity = getOffersByCity(offers);
+  offersByCity.forEach((city) => {
+    cities.push(city.city);
+  });
+  return cities;
+}
+
+

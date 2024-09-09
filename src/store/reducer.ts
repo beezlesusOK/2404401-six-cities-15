@@ -1,35 +1,61 @@
-import { createReducer } from '@reduxjs/toolkit';
-import {changeCity, changeSortOffers, getOffers} from './action';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {sortOptions} from '../util/const';
 import { TCity, TOffer, TSortItem } from '../util/types';
-import { cities } from '../mocks/city';
-import { generateOffers } from '../mocks/offers';
-
-const offers: TOffer = generateOffers(50);
+import {State} from './state';
+import {fetchOffers} from '../thunk/offers';
+import {StatusLoading} from '../util/const';
+import {getCitiesFromOffers} from '../util/func';
 
 type TOffersState = {
-  city: TCity;
-  offers: TOffer[];
+  city?: TCity;
+  offers?: TOffer[];
   sort: TSortItem;
+  statusLoading: StatusLoading;
 }
 
 const initialState: TOffersState = {
-  city: cities[0],
-  offers: offers,
   sort: sortOptions[0],
+  statusLoading: StatusLoading.None,
 };
 
-
-export const reducer = createReducer(initialState, (builder) => {
-  builder
-    .addCase(changeCity, (state, action) => {
+const offersSlice = createSlice({
+  extraReducers: (builder) =>
+    builder
+      .addCase(fetchOffers.pending, (state) => {
+        state.statusLoading = StatusLoading.Loading;
+      })
+      .addCase(fetchOffers.fulfilled, (state, action) => {
+        state.statusLoading = StatusLoading.Success;
+        const offers = action.payload;
+        if (offers.length) {
+          state.city = getCitiesFromOffers(offers)[0] ?? [];
+        }
+        state.offers = action.payload;
+      })
+      .addCase(fetchOffers.rejected, (state) => {
+        state.statusLoading = StatusLoading.Failed;
+      }),
+  initialState,
+  name: 'offers',
+  reducers: {
+    changeCity: (state, action: PayloadAction<TCity>) => {
       state.city = action.payload;
-    })
-    .addCase(getOffers, (state, action) => {
+    },
+    getOffers: (state, action: PayloadAction<TOffer[]>) => {
       state.offers = action.payload;
-    })
-    .addCase(changeSortOffers, (state, action) => {
+    },
+    changeSortOffers: (state, action: PayloadAction<TSortItem>) => {
       state.sort = action.payload;
-    });
+    }
+  },
 });
-export default reducer;
+
+const offersActions = offersSlice.actions;
+const offersSelectors = {
+  selectCity: (state: State) => state.city ?? <TCity>{},
+  selectOffers: (state: State) => state.offers ?? <TOffer[]>[],
+  selectSortItem: (state: State) => state.sort ?? sortOptions[0],
+  selectStatusLoading: (state: State) => state.statusLoading ?? StatusLoading.None,
+};
+
+export {offersSlice, offersActions, offersSelectors};

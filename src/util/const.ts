@@ -10,13 +10,13 @@ export const Setting = {
   cardsCount: 5,
 } as const;
 
-export enum AppRoute {
-  Main = '/',
-  Login = '/login',
-  Favorites = '/favorites',
-  OfferId = '/offer/:id',
-  Offer = '/offer',
-  Error404 = '/error404',
+export enum AppRoutess {
+  Main='/',
+  Login='/login',
+  Favorites='/favorites',
+  Offer='/offer',
+  OfferId='/offer/:id',
+  Error404='/*',
 }
 
 export enum AuthorizationStatus {
@@ -55,3 +55,16 @@ export const sortOptions: TSortItem[] = [
     name: 'Top rated first',
   }
 ];
+export enum Endpoint {
+  Offers = '/offers',
+  Favorite = '/favorite',
+  Login = '/login',
+  Logout = '/logout',
+}
+
+export enum StatusLoading {
+  None,
+  Loading,
+  Success,
+  Failed,
+}
