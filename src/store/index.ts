@@ -1,14 +1,20 @@
-import {configureStore} from '@reduxjs/toolkit';
-import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
-
-import {offersSlice} from './reducer';
-import {AppDispatch, State} from './state';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
+import {offerDetailSlice} from './slices/offer-detail';
+import {commentsSlice} from './slices/comments';
+import {offersSlice} from './slices/offers';
 import {createApi} from '../services/api';
+import { userSlice } from './slices/user';
 
 export const api = createApi();
+const rootReducer = combineReducers({
+  [offersSlice.name]: offersSlice.reducer,
+  [userSlice.name]: userSlice.reducer,
+  [offerDetailSlice.name]: offerDetailSlice.reducer,
+  [commentsSlice.name]: commentsSlice.reducer,
+});
 
 export const store = configureStore({
-  reducer: offersSlice.reducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
@@ -16,6 +22,3 @@ export const store = configureStore({
       },
     }),
 });
-
-export const useAppDispatch = () => useDispatch<AppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<State> = useSelector;

@@ -16,6 +16,9 @@ export function getNearOffers(offers: TOffer[], curOffer: TOffer): TOffer[] {
   }
   return nearOffers;
 }
+export function getRatingWidth(rating: number): string {
+  return `${rating * (100 / 5)}%`;
+}
 
 export function getOffersByCity(offers: TOffer[]): TOffersByCity[] {
   if (!offers) {

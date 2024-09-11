@@ -10,7 +10,7 @@ export const Setting = {
   cardsCount: 5,
 } as const;
 
-export enum AppRoutess {
+export enum AppRoutes {
   Main='/',
   Login='/login',
   Favorites='/favorites',
@@ -19,10 +19,10 @@ export enum AppRoutess {
   Error404='/*',
 }
 
-export enum AuthorizationStatus {
-  Auth = 'AUTH',
-  NoAuth = 'NO_AUTH',
-  Unknown = 'UNKNOWN',
+export enum AuthStatus {
+  Auth = 'Auth',
+  NoAuth = 'NoAuth',
+  Unknown = 'Unknown',
 }
 
 export const defaultCustomIcon = leaflet.icon({
@@ -60,6 +60,7 @@ export enum Endpoint {
   Favorite = '/favorite',
   Login = '/login',
   Logout = '/logout',
+  Comments = '/comments',
 }
 
 export enum StatusLoading {

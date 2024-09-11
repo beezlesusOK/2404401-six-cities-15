@@ -1,27 +1,52 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import {TOffer} from '../../util/types';
+
+import {getRatingWidth} from '../../util/func';
 import Error404 from '../../components/404/404';
 import Reviews from '../../components/review/review';
-import { getNearOffers } from '../../util/func';
-import { AuthorizationStatus, OFFER_INSIDE_ITEM } from '../../util/const';
 import Map from '../../components/map/map';
 import OffersList from './offers-list';
+import {useActionCreators, useAppSelector} from '../../store/hooks';
+import {offerDetailActions, offerDetailSelectors} from '../../store/slices/offer-detail';
+import {StatusLoading} from '../../util/const';
+import {offersSelectors} from '../../store/slices/offers';
+import {Loader} from '../../components/loader/loader';
+import {commentsActions, commentsSelectors} from '../../store/slices/comments';
+import {TOffer} from '../../util/types';
 
-function getRatingWidth(rating: number): string {
-  return `${rating * (100 / 5)}%`;
-}
-
-function OfferScreen({offers, authStatus}: {offers: TOffer[]; authStatus: AuthorizationStatus}): React.JSX.Element {
+function OfferDetail(): React.JSX.Element {
   const {id} = useParams();
-  const curOffer = offers.find((offer: TOffer) => offer.id === id);
+  const statusLoading = useAppSelector(offersSelectors.selectStatusLoading);
+  const {fetchOfferDetailAction, fetchOffersNearbyAction} = useActionCreators(offerDetailActions);
+  const {fetchCommentsAction} = useActionCreators(commentsActions);
 
-  if (!curOffer) {
-    return <Error404 />;
+  const offers = useAppSelector(offersSelectors.selectOffers);
+  const curOffer = useAppSelector(offerDetailSelectors.selectOffer);
+  const nearOffers = useAppSelector(offerDetailSelectors.selectOffersNearby);
+  const comments = useAppSelector(commentsSelectors.selectComments);
+
+  useEffect(() => {
+    if (id) {
+      fetchOfferDetailAction(id);
+      fetchOffersNearbyAction(id);
+      fetchCommentsAction(id);
+    }
+  }, [fetchCommentsAction, fetchOfferDetailAction, fetchOffersNearbyAction, id]);
+
+  if (statusLoading === StatusLoading.Loading) {
+    return <Loader />;
   }
 
-  const nearOffers = getNearOffers(offers, curOffer);
-  const nearOffersMap = [curOffer, ...nearOffers];
+  if (!curOffer) {
+    return <Error404 type='offer'/>;
+  }
+
+  let nearOffersMap = [offers.find((offer) => offer.id === curOffer.id)] as TOffer[];
+  if (nearOffers) {
+    nearOffersMap = [...nearOffersMap, ...nearOffers];
+  }
+
+  const commentsCount = comments ? comments.length : 0;
 
   return (
     <main className="page__main page__main--offer">
@@ -85,11 +110,36 @@ function OfferScreen({offers, authStatus}: {offers: TOffer[]; authStatus: Author
             <div className="offer__inside">
               <h2 className="offer__inside-title">What&apos;s inside</h2>
               <ul className="offer__inside-list">
-                {OFFER_INSIDE_ITEM.map((item) => (
-                  <li className='offer__inside-item' key={item}>
-                    {item}
-                  </li>
-                )) as React.JSX.Element[]}
+                <li className="offer__inside-item">
+                  Wi-Fi
+                </li>
+                <li className="offer__inside-item">
+                  Washing machine
+                </li>
+                <li className="offer__inside-item">
+                  Towels
+                </li>
+                <li className="offer__inside-item">
+                  Heating
+                </li>
+                <li className="offer__inside-item">
+                  Coffee machine
+                </li>
+                <li className="offer__inside-item">
+                  Baby seat
+                </li>
+                <li className="offer__inside-item">
+                  Kitchen
+                </li>
+                <li className="offer__inside-item">
+                  Dishwasher
+                </li>
+                <li className="offer__inside-item">
+                  Cabel TV
+                </li>
+                <li className="offer__inside-item">
+                  Fridge
+                </li>
               </ul>
             </div>
             <div className="offer__host">
@@ -118,17 +168,15 @@ function OfferScreen({offers, authStatus}: {offers: TOffer[]; authStatus: Author
               </div>
             </div>
             <section className="offer__reviews reviews">
-              <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">{curOffer.reviews.length}</span></h2>
-              <Reviews authStatus={authStatus} reviews={curOffer.reviews}/>
+              <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">{commentsCount}</span></h2>
+              <Reviews />
             </section>
           </div>
         </div>
-        <Map className="offer__map" activeOffer={curOffer} offers={nearOffersMap} activeCity={curOffer.city} />
+        <Map className="offer__map" activeOffer={curOffer} offers={nearOffersMap} />
       </section>
-      <OffersList nameBlock="Other places in the neighbourhood" />
+      <OffersList nameBlock="Other places in the neighbourhood" offers={nearOffers} isOfferDetail />
     </main>
   );
 }
-
-
-export default OfferScreen;
+export default OfferDetail;

@@ -1,36 +1,28 @@
-import {AppRoutess} from '../../util/const';
+import {AppRoutes} from '../../util/const';
 import {TOffer} from '../../util/types';
-import {useAppSelector} from '../../store';
-import {offersSelectors} from '../../store/reducer';
 import OfferCard from './offer-card';
 import Map from '../../components/map/map';
 import OffersSorting from '../../components/sort/sorting';
-import {getSortedOffers} from '../../util/func';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
-export default function OffersList({nameBlock}: {nameBlock: string}): React.JSX.Element {
-  const offers = useAppSelector(offersSelectors.selectOffers);
-  const activeCity = useAppSelector(offersSelectors.selectCity);
-  const activeSortItem = useAppSelector(offersSelectors.selectSortItem);
+type TOffersList = {
+  nameBlock: string;
+  offers?: TOffer[];
+  isOfferDetail?: boolean;
+}
 
-  let offersFiltered = activeCity
-    ? offers.filter((offer) => offer.city.name === activeCity.name)
-    : offers;
-
-  offersFiltered = getSortedOffers(offersFiltered, activeSortItem);
-
+export default function OffersList({nameBlock, offers = [], isOfferDetail = false}: TOffersList): React.JSX.Element {
   const [activeOffer, setActiveOffer] = useState<TOffer | null>(null);
   const handleHover = (offer?: TOffer) => {
     setActiveOffer(offer || null);
   };
-  const {pathname} = useLocation() as {pathname: AppRoutess};
-  const isMainPage = pathname === AppRoutess.Main;
-  const offerIdPageRegExp = /\/offer\/[\d+]/g;
-  const isOfferIdPage: boolean = offerIdPageRegExp.test(pathname);
+  const {pathname} = useLocation() as {pathname: AppRoutes};
 
-  const issetOffers = offersFiltered.length > 0;
+  const isMainPage = pathname === AppRoutes.Main;
+
+  const issetOffers = offers.length > 0;
 
   const classContainer = classNames(
     'container',
@@ -41,17 +33,18 @@ export default function OffersList({nameBlock}: {nameBlock: string}): React.JSX.
     {'places': issetOffers},
     {'cities__no-places': !issetOffers},
     {'cities__places': isMainPage && issetOffers},
-    {'near-places': isOfferIdPage && issetOffers}
+    {'near-places': isOfferDetail && issetOffers}
   );
   const classH2 = classNames(
     {'visually': isMainPage},
-    {'near-places__title': isOfferIdPage}
+    {'near-places__title': isOfferDetail}
   );
   const classList = classNames(
     'places__list',
     {'cities__places-list tabs__content': isMainPage},
-    {'near-places__list': isOfferIdPage}
+    {'near-places__list': isOfferDetail}
   );
+
   return (
     <div className={classContainer}>
       <section className={classSection}>
@@ -63,18 +56,19 @@ export default function OffersList({nameBlock}: {nameBlock: string}): React.JSX.
           issetOffers &&
           isMainPage &&
           <>
-            <b className="places__found">{Object.keys(offersFiltered).length} places to stay in Amsterdam</b>
+            <b className="places__found">{Object.keys(offers).length} places to stay in Amsterdam</b>
             <OffersSorting />
           </>
         }
         {
           issetOffers &&
           <div className={classList}>
-            {offersFiltered.map((offer) => (
+            {offers.map((offer) => (
               <OfferCard
                 key={offer.id}
                 offer={offer}
                 handleHover={handleHover}
+                isOfferDetail
               />
             )) as React.JSX.Element[]}
           </div>
@@ -95,7 +89,7 @@ export default function OffersList({nameBlock}: {nameBlock: string}): React.JSX.
         <div className="cities__right-section">
           {
             issetOffers &&
-            <Map className="cities__map" activeOffer={activeOffer} offers={offersFiltered} activeCity={activeCity} />
+            <Map className="cities__map" activeOffer={activeOffer} offers={offers} />
           }
         </div>
       }
